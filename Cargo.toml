@@ -1,0 +1,26 @@
+[package]
+name = "gemini-cost"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.74"
+description = "Calculate Google Gemini API call cost from a usage block. Cache-aware, supports Gemini 2.5 Pro/Flash/Flash-Lite and 2.0 families, BYO pricing override. No SDK dependency."
+authors = ["Mukunda Rao Katta <mukunda.vjcs6@gmail.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/MukundaKatta/gemini-cost"
+homepage = "https://github.com/MukundaKatta/gemini-cost"
+documentation = "https://docs.rs/gemini-cost"
+readme = "README.md"
+keywords = ["google", "gemini", "llm", "cost", "pricing"]
+categories = ["api-bindings", "science"]
+exclude = [".github/*", "target/*"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"], optional = true }
+serde_json = { version = "1", optional = true }
+
+[features]
+default = []
+serde = ["dep:serde", "dep:serde_json"]
+
+[dev-dependencies]
+serde_json = "1"
