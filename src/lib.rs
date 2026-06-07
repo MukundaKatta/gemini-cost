@@ -56,5 +56,5 @@ mod pricing;
 mod usage;
 
 pub use normalize::normalize_model_id;
-pub use pricing::{default_pricing, Pricing, LONG_PROMPT_THRESHOLD, DEFAULT_PRICING_TABLE};
+pub use pricing::{default_pricing, Pricing, DEFAULT_PRICING_TABLE, LONG_PROMPT_THRESHOLD};
 pub use usage::Usage;

@@ -53,7 +53,9 @@ mod tests {
     #[test]
     fn strips_vertex_resource_path() {
         assert_eq!(
-            normalize_model_id("projects/p/locations/us-central1/publishers/google/models/gemini-2.5-pro"),
+            normalize_model_id(
+                "projects/p/locations/us-central1/publishers/google/models/gemini-2.5-pro"
+            ),
             "gemini-2.5-pro"
         );
     }

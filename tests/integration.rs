@@ -88,6 +88,39 @@ fn gemini_usage_constructor_subtracts_cached() {
 }
 
 #[test]
+fn cached_tokens_count_toward_long_prompt_tier() {
+    let pricing = default_pricing("gemini-2.5-pro").unwrap();
+    // 150k fresh + 100k cached = 250k total prompt tokens. Gemini's
+    // promptTokenCount (250k) crosses the 200k threshold, so the whole
+    // request bills at the long tier even though fresh input alone is
+    // below the threshold.
+    let usage = Usage {
+        input_tokens: 150_000,
+        output_tokens: 0,
+        cached_input_tokens: 100_000,
+    };
+    // long-tier: 150_000 * 2.5 + 100_000 * 0.625 = 0.375 + 0.0625 = 0.4375
+    let cost = pricing.cost_for(&usage);
+    assert!((cost - 0.4375).abs() < 1e-6, "got {cost}");
+}
+
+#[test]
+fn cache_hit_uses_cached_rate() {
+    let pricing = default_pricing("gemini-2.5-pro").unwrap();
+    // 100k cached tokens: total prompt stays under the 200k threshold, so
+    // the short-tier cached rate ($0.3125/Mtok) applies.
+    let usage = Usage {
+        input_tokens: 0,
+        output_tokens: 0,
+        cached_input_tokens: 100_000,
+    };
+    assert!(usage.cache_hit());
+    // 100_000 * 0.3125 / 1_000_000 = 0.03125
+    let cost = pricing.cost_for(&usage);
+    assert!((cost - 0.03125).abs() < 1e-6, "got {cost}");
+}
+
+#[test]
 fn flat_pricing_helper() {
     let p = Pricing::flat(1.0, 4.0, 0.25);
     assert_eq!(p.input_per_mtok, p.input_long_per_mtok);

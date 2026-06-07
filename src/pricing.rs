@@ -45,8 +45,15 @@ impl Pricing {
     }
 
     /// Compute USD cost for the given usage.
+    ///
+    /// The long-prompt tier is selected from the *total* prompt size —
+    /// fresh input plus cached input — because Gemini's
+    /// `promptTokenCount` (which drives the >200k uplift) includes cached
+    /// content tokens. Tiering on fresh input alone would under-bill
+    /// cache-heavy prompts that cross the threshold.
     pub fn cost_for(&self, usage: &Usage) -> f64 {
-        let long = usage.input_tokens > LONG_PROMPT_THRESHOLD;
+        let prompt_tokens = usage.input_tokens.saturating_add(usage.cached_input_tokens);
+        let long = prompt_tokens > LONG_PROMPT_THRESHOLD;
         let (input_r, output_r, cached_r) = if long {
             (
                 self.input_long_per_mtok,
